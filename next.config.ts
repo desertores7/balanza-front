@@ -2,6 +2,22 @@ import type { NextConfig } from "next";
 import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
+  // 🚀 Optimizaciones de build
+  productionBrowserSourceMaps: false, // Desactivar sourcemaps en producción (mejora velocidad)
+  compress: true, // Comprimir respuestas
+  poweredByHeader: false, // Remover header X-Powered-By
+  
+  // ⚡ Optimización de JavaScript
+  swcMinify: true, // Usar SWC minifier (más rápido que Terser)
+  
+  // 📦 Optimización de compilación
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+  
+  // 🖼️ Configuración de imágenes
   images: {
     remotePatterns: [
       {
@@ -11,7 +27,10 @@ const nextConfig: NextConfig = {
         pathname: '/storage/v1/object/public/**',
       },
     ],
+    formats: ['image/avif', 'image/webp'], // Formatos modernos optimizados
   },
+  
+  // 📋 Headers optimizados
   async headers() {
     return [
       {
@@ -65,7 +84,8 @@ const pwaConfig = withPWA({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: false, // Habilitado para desarrollo y producción
+  disable: process.env.NODE_ENV === 'development', // ⚡ Desactivar en desarrollo para builds más rápidos
+  buildExcludes: [/middleware-manifest\.json$/], // Excluir archivos innecesarios
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/rlujmuudmcsaujtwdmkz\.supabase\.co\/.*/i,
