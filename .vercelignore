@@ -1,0 +1,26 @@
+# Archivos a ignorar en el build de Vercel para acelerar el deploy
+.git
+.github
+.vscode
+.idea
+node_modules
+*.log
+*.md
+README.md
+docs
+tests
+test
+__tests__
+*.test.ts
+*.test.tsx
+*.test.js
+*.test.jsx
+*.spec.ts
+*.spec.tsx
+*.spec.js
+*.spec.jsx
+coverage
+.env*.local
+.DS_Store
+Thumbs.db
+
