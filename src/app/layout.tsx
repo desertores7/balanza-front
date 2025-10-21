@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="es" data-scroll-behavior="smooth">
       <head>
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="/manifest" />
         <meta name="theme-color" content="#007bff" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
