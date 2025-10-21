@@ -1,0 +1,13 @@
+@use "../helpers/_mixins.scss" as mixins;
+.dashboardContainer {
+    // Comportamiento normal en desktop
+    display: block;
+}
+
+// Ocultar todo el dashboard en móviles/tablets
+.dashboardContainer{
+    display: none;
+    @include mixins.media-md{
+        display: block;
+    }
+}

@@ -1,0 +1,61 @@
+{
+  "name": "Balanza Frontend - Sistema de Pesaje",
+  "short_name": "Balanza",
+  "description": "Sistema de gestión de pesaje para vehículos y productos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/Logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/Logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/Logo.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Acceso rápido al dashboard principal",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/assets/Logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Pesaje",
+      "short_name": "Pesaje",
+      "description": "Acceso rápido al módulo de pesaje",
+      "url": "/pesaje",
+      "icons": [
+        {
+          "src": "/assets/Logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

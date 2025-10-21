@@ -1,0 +1,180 @@
+.authContainer{
+    background-color: var(--background-primary);
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+
+    .boxLogo{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .boxContainer{
+        position: relative;
+        max-width: 460px;
+        margin: 0 auto;        
+       }
+
+
+       .loadingDots{
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        &.dotsTop{
+            right:  0;
+            top: 0;            
+            transform: translate(50%, -50%);
+        }
+        &.dotsBottom{
+            left: 0;
+            bottom: 0;
+            transform: translate(-50%, 50%);
+        }
+        svg{
+            g path{
+                fill: #C4C5FF;
+            }
+        }
+       }
+
+    .boxComponent{
+        background-color: var(--background-primary);
+        border-radius: 15px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;        
+        padding: 30px;
+        margin: auto;
+        gap: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            padding: 2px;
+            background: linear-gradient(45deg,#4C63E3, #0BEEBF, #17D4C6, #2AABD1, #3D83DB, #0BEEBF, #4473DF,  #0BEEBF);
+            background-size: 400% 400%;
+            animation: gradientMove 3s ease infinite;
+            z-index: -1;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+        }
+        
+
+        form{
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+         }
+
+         .title{
+            font-size: 25px;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: left;
+         }
+
+         .subtitle{
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-primary);
+            text-align: left;
+            margin: 0;
+         }
+    }
+    
+    .rememberContainer{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .rememberMe{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+
+        p{
+            margin: 0px;
+            font-size: 13px;
+        }
+
+    }
+    .signUp{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+    a{
+        color: var(--primary) !important;
+        text-decoration: none !important;
+        font-size: 13px;
+        font-weight: 400;
+        &:hover{
+            text-decoration: underline;
+        }
+    }
+    
+    .boxSubRegister{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 25px;
+        margin: 10px 0;
+
+        svg{
+            fill: var(--primary) !important;
+            cursor: pointer;
+        }
+    }
+
+    .boxButtonBack{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin: 10px 0px;
+        a{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    }
+
+    .errorMessage {
+        color: var(--errors);
+        font-size: 13px;
+        margin: 0px;
+    }
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

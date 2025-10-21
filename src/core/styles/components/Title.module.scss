@@ -1,0 +1,40 @@
+.titleTable{
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+}
+.smallCardTitle{
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+.smallCardSubtitle{
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-info);
+}
+
+.sidebarTitle{
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 0;
+    color: #BEC7CC;
+    font-family: var(--secondary-font);
+  }
+
+.titleNav{
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0;
+    text-transform: capitalize;
+    span{
+        color: var(--primary);
+    }
+}

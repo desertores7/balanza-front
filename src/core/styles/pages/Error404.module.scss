@@ -1,0 +1,246 @@
+.errorContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--text-secondary) 100%);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+  }
+}
+
+.errorContent {
+  text-align: center;
+  z-index: 2;
+  position: relative;
+  max-width: 600px;
+  margin-right: 3rem;
+}
+
+.errorNumber {
+  font-size: 8rem;
+  font-weight: 900;
+  color: var(--text-white);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+  margin-bottom: 1rem;
+  line-height: 1;
+  background: linear-gradient(45deg, var(--text-white), var(--background-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+  to {
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+  }
+}
+
+.errorTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.errorDescription {
+  font-size: 1.2rem;
+  color: var(--text-white);
+  opacity: 0.9;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.errorActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.homeButton {
+  background: linear-gradient(45deg, var(--primary), var(--success));
+  color: var(--text-white);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(43, 209, 199, 0.4);
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(43, 209, 199, 0.6);
+    text-decoration: none;
+    color: var(--text-white);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.backButton {
+  background: transparent;
+  color: var(--text-white);
+  padding: 1rem 2rem;
+  border: 2px solid var(--text-white);
+  opacity: 0.8;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-white);
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.errorIllustration {
+  z-index: 1;
+  position: relative;
+}
+
+.illustration404 {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+.zero, .four {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--text-white);
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--text-white);
+  opacity: 0.2;
+  animation: float 3s ease-in-out infinite;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.zero {
+  animation-delay: 0s;
+}
+
+.four:nth-of-type(2) {
+  animation-delay: 0.5s;
+}
+
+.zero:nth-of-type(3) {
+  animation-delay: 1s;
+}
+
+.four:nth-of-type(4) {
+  animation-delay: 1.5s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotateY(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotateY(180deg);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .errorContainer {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .errorContent {
+    margin-right: 0;
+    margin-bottom: 2rem;
+  }
+
+  .errorNumber {
+    font-size: 6rem;
+  }
+
+  .errorTitle {
+    font-size: 2rem;
+  }
+
+  .errorDescription {
+    font-size: 1rem;
+  }
+
+  .errorActions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .homeButton, .backButton {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .illustration404 {
+    gap: 0.5rem;
+  }
+
+  .zero, .four {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .errorNumber {
+    font-size: 4rem;
+  }
+
+  .errorTitle {
+    font-size: 1.5rem;
+  }
+
+  .zero, .four {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+}

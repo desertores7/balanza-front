@@ -1,0 +1,58 @@
+@use "../helpers/_mixins.scss" as mixins;
+
+
+.mobileWarning{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--body);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    text-align: center;
+    overflow: hidden;
+    
+    .warningContent{
+        background-color: var(--background-primary);
+        padding: 40px 30px;
+        border-radius: 12px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        
+        .warningIcon{
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--errors);
+        }
+        
+        .warningTitle{
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .warningText{
+            font-size: 14px;
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+    }
+}
+
+
+
+// Media query para tablets y móviles
+.mobileWarning{
+    display: flex;
+    @include mixins.media-md{
+        display: none;
+    }
+}

@@ -1,0 +1,604 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client'
+import React, { useEffect, useRef, useState } from 'react';
+
+/* ===== Tipos Web Serial (para navegador) ===== */
+declare global {
+  // Tipos Web Serial (para navegador)
+  interface SerialPort {
+    readable: ReadableStream<Uint8Array> | null;
+    writable: WritableStream<Uint8Array> | null;
+    open(options: SerialOptions): Promise<void>;
+    close(): Promise<void>;
+    getInfo?: () => { usbVendorId?: number; usbProductId?: number };
+  }
+  interface SerialOptions {
+    baudRate: number;
+    dataBits?: 7 | 8;
+    stopBits?: 1 | 2;
+    parity?: 'none' | 'even' | 'odd';
+    bufferSize?: number;
+    flowControl?: 'none' | 'hardware';
+  }
+  interface Navigator {
+    serial: {
+      requestPort(opts?: { filters?: Array<{ usbVendorId?: number; usbProductId?: number }> }): Promise<SerialPort>;
+      getPorts(): Promise<SerialPort[]>;
+      addEventListener(type: 'connect' | 'disconnect', listener: any): void;
+      removeEventListener(type: 'connect' | 'disconnect', listener: any): void;
+    };
+  }
+}
+
+type SerialPortLike = SerialPort & {
+  setSignals?: (signals: { dataTerminalReady?: boolean; requestToSend?: boolean }) => Promise<void>;
+};
+
+// La detección de Electron se hará en useEffect para funcionar correctamente en el cliente
+const supportsWebSerial = typeof navigator !== 'undefined' && 'serial' in (navigator as any);
+
+/* ===== Config (Opción 2: 8N1 + CR) ===== */
+const BAUD = 1200;
+const DATABITS: 7 | 8 = 8;
+const PARITY: 'none' | 'even' | 'odd' = 'none';
+const STOPBITS: 1 | 2 = 1;
+
+/* ===== Afinado de UX =====
+   - Si no recibimos tramas durante este tiempo, "reseteamos" el display a 0.000
+   - Ajustado para scripts que envían datos cada 5 segundos
+*/
+const FRAME_TIMEOUT_MS = 10000; // 10 segundos para dar tiempo a scripts lentos
+
+/* Pequeño suavizado para evitar que titile si llegan variaciones mínimas */
+const SMOOTH_WINDOW = 1; // Sin suavizado para evitar saltos con datos lentos
+
+/* ===== Utils ===== */
+function formatWeight(kg: number): string {
+  // Siempre mostrar como número entero, sin decimales
+  return Math.round(kg).toString();
+}
+
+function makeLineTransformer() {
+  let buffer = '';
+  return new TransformStream<string, string>({
+    transform(chunk, controller) {
+      buffer += chunk;
+      // Manejar tanto \r\n como \r
+      const lines = buffer.split(/\r\n|\r|\n/);
+      buffer = lines.pop() ?? '';
+      for (const line of lines) {
+        if (line.trim()) controller.enqueue(line);
+      }
+    },
+    flush(controller) {
+      if (buffer.trim()) controller.enqueue(buffer);
+    },
+  });
+}
+
+/* ===== Parser La Torre =====
+   Acepta múltiples formatos:
+   1. Formato La Torre original: "D######" (6 dígitos en gramos) -> D025500 = 25.500 kg
+   2. Formato simple 5 dígitos: "#####" (5 dígitos en kg) -> 00025 = 25.000 kg
+   3. Formato simple 1-6 dígitos: "###" -> 123 = 123.000 kg
+*/
+function parseLaTorre(rawIn: string): { ok: boolean; kg?: number } {
+  const raw = rawIn.trim();
+  
+  // Formato 1: La Torre original (D + 6 dígitos en gramos)
+  const laTorreMatch = raw.match(/^D(\d{6})$/i);
+  if (laTorreMatch) {
+    const grams = Number(laTorreMatch[1]);
+    if (Number.isFinite(grams)) {
+      return { ok: true, kg: grams / 1000 };
+    }
+  }
+  
+  // Formato 2: Simple (5 dígitos exactos en kg)
+  const fiveDigitMatch = raw.match(/^(\d{5})$/);
+  if (fiveDigitMatch) {
+    const kg = Number(fiveDigitMatch[1]);
+    if (Number.isFinite(kg)) {
+      return { ok: true, kg: kg };
+    }
+  }
+  
+  // Formato 3: Cualquier número (1-6 dígitos)
+  const anyNumberMatch = raw.match(/^(\d{1,6})$/);
+  if (anyNumberMatch) {
+    const kg = Number(anyNumberMatch[1]);
+    if (Number.isFinite(kg)) {
+      return { ok: true, kg: kg };
+    }
+  }
+  
+  return { ok: false };
+}
+
+/* ===== Componente ===== */
+export default function BalanzaLaTorre() {
+  const [connected, setConnected] = useState(false);
+  const [displayKg, setDisplayKg] = useState('0');
+  const [availablePorts, setAvailablePorts] = useState<string[]>([]);
+  const [selectedPort, setSelectedPort] = useState<string>('');
+  const [connectionStatus, setConnectionStatus] = useState<string>('');
+  const [isElectronApp, setIsElectronApp] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  const [isElectron, setIsElectron] = useState(false);
+
+  const portRef = useRef<SerialPortLike | null>(null);
+  const readerRef = useRef<ReadableStreamDefaultReader<string> | null>(null);
+  const keepRef = useRef(false);
+
+  const lastSeenRef = useRef<number>(0);
+  const smoothRef = useRef<number[]>([]);
+
+  // Detectar Electron al montar el componente
+  useEffect(() => {
+    const detectElectron = () => {
+      const isElectronRuntime = typeof window !== 'undefined' && window.isElectron;
+      const hasElectronSerial = typeof window !== 'undefined' && window.electronSerial;
+      const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
+      
+      // Detectar Electron por múltiples métodos
+      const isElectronByUA = userAgent.includes('Electron');
+      const isElectronByProcess = typeof window !== 'undefined' && (window as any).process?.type === 'renderer';
+      const isElectronByAPI = isElectronRuntime;
+      
+      const electronDetected = !!(isElectronByUA || isElectronByProcess || isElectronByAPI);
+      
+      console.log('🔍 Debug - Electron Detection:', {
+        isElectronRuntime,
+        hasElectronSerial,
+        isElectronByUA,
+        isElectronByProcess,
+        electronDetected,
+        userAgent,
+        electronSerialMethods: hasElectronSerial ? Object.keys(window.electronSerial || {}) : 'N/A'
+      });
+      
+      setIsElectron(electronDetected);
+      setIsElectronApp(electronDetected && !!hasElectronSerial);
+      
+      if (electronDetected && hasElectronSerial) {
+        setDebugInfo('✅ Electron detectado correctamente');
+      } else if (electronDetected) {
+        setDebugInfo('⚠️ Electron detectado pero sin API serial');
+      } else {
+        setDebugInfo('ℹ️ Ejecutándose en navegador web');
+      }
+    };
+    
+    // Ejecutar inmediatamente
+    detectElectron();
+    
+    // También ejecutar después de un pequeño delay por si el preload tarda en cargar
+    const timeout = setTimeout(detectElectron, 100);
+    
+    return () => clearTimeout(timeout);
+  }, []);
+
+  // watchdog: si no llegan datos, volver a 0
+  useEffect(() => {
+    if (!connected) return;
+    const id = setInterval(() => {
+      if (!lastSeenRef.current) return;
+      const elapsed = Date.now() - lastSeenRef.current;
+      if (elapsed > FRAME_TIMEOUT_MS) {
+        smoothRef.current = [];
+        setDisplayKg('0');
+      }
+    }, 1000); // Verificar cada segundo
+    return () => clearInterval(id);
+  }, [connected]);
+
+  async function openPort(port: SerialPortLike) {
+    try { readerRef.current?.releaseLock(); } catch {}
+    try { await port.close?.(); } catch {}
+    await new Promise((r) => setTimeout(r, 50));
+
+    await port.open({
+      baudRate: BAUD,
+      dataBits: DATABITS,
+      parity: PARITY,
+      stopBits: STOPBITS,
+      flowControl: 'none',
+    });
+    if (port.setSignals)
+      await port.setSignals({ dataTerminalReady: true, requestToSend: true });
+    await new Promise((r) => setTimeout(r, 40));
+  }
+
+  // Función para conectar en Electron
+  async function connectElectron(portPath?: string) {
+    try {
+      console.log('🔗 Iniciando conexión Electron...');
+      
+      if (!window.electronSerial) {
+        throw new Error('API de Electron Serial no disponible');
+      }
+
+      let targetPort = portPath;
+      
+      // Si no se especifica puerto, auto-detectar
+      if (!targetPort) {
+        if (!window.electronSerial.autoDetect) {
+          throw new Error('Función de auto-detección no disponible');
+        }
+        setConnectionStatus('Detectando puerto automáticamente...');
+        console.log('🔄 Ejecutando auto-detección...');
+        
+        const autoResult = await window.electronSerial.autoDetect();
+        console.log('📋 Resultado auto-detección:', autoResult);
+        
+        if (!autoResult.success) {
+          throw new Error(autoResult.error || 'No se pudo detectar puerto automáticamente');
+        }
+        targetPort = autoResult.port!;
+        setConnectionStatus(`Puerto detectado: ${targetPort}`);
+      }
+
+      setConnectionStatus(`Conectando a ${targetPort}...`);
+      console.log(`🔌 Conectando a puerto: ${targetPort}`);
+      
+      const result = await window.electronSerial.connect(targetPort, {
+        baudRate: BAUD,
+        dataBits: DATABITS,
+        parity: PARITY,
+        stopBits: STOPBITS
+      });
+
+      console.log('🔗 Resultado de conexión:', result);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Error al conectar');
+      }
+
+      // Configurar listener para datos
+      console.log('📡 Configurando listener de datos...');
+      const removeListener = window.electronSerial.onData((data: string) => {
+        console.log('📊 Dato recibido:', data);
+        const raw = data.trim();
+        if (!raw) return;
+
+        const res = parseLaTorre(raw);
+        if (!res.ok || typeof res.kg !== 'number') return;
+
+        // timestamp de "vida"
+        lastSeenRef.current = Date.now();
+
+        // suavizado simple
+        const arr = smoothRef.current;
+        arr.push(res.kg);
+        if (arr.length > SMOOTH_WINDOW) arr.shift();
+        const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
+
+        setDisplayKg(formatWeight(avg));
+      });
+
+      // Guardar referencia para limpieza posterior
+      window.electronSerial.removeDataListener = () => {
+        if (typeof removeListener === 'function') {
+          removeListener();
+        }
+      };
+
+      setConnected(true);
+      setSelectedPort(targetPort);
+      setConnectionStatus('Conectado');
+      lastSeenRef.current = 0;
+      smoothRef.current = [];
+      setDisplayKg('0');
+
+      console.log('✅ Conexión completada exitosamente');
+
+    } catch (e: any) {
+      console.error('❌ Error en conexión Electron:', e);
+      setConnected(false);
+      setConnectionStatus(`Error: ${e.message}`);
+      setDisplayKg('0');
+    }
+  }
+
+  // Función para conectar en navegador web (original)
+  async function connectWeb() {
+    try {
+      if (!supportsWebSerial) throw new Error('Este navegador no soporta Web Serial');
+
+      setConnectionStatus('Seleccionando puerto...');
+      const port = (await navigator.serial.requestPort()) as SerialPortLike;
+      portRef.current = port;
+      await openPort(port);
+
+      const decoder = new TextDecoderStream('ascii', { fatal: false, ignoreBOM: true });
+      const lined = port.readable!.pipeThrough(decoder as any).pipeThrough(makeLineTransformer());
+      const reader = lined.getReader();
+      readerRef.current = reader;
+
+      keepRef.current = true;
+      setConnected(true);
+      setConnectionStatus('Conectado');
+      lastSeenRef.current = 0;
+      smoothRef.current = [];
+      setDisplayKg('0.000');
+
+      (async () => {
+        while (keepRef.current) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (typeof value !== 'string') continue;
+
+          const raw = value.trim();
+          if (!raw) continue;
+
+          const res = parseLaTorre(raw);
+          if (!res.ok || typeof res.kg !== 'number') continue;
+
+          // timestamp de "vida"
+          lastSeenRef.current = Date.now();
+
+          // suavizado simple
+          const arr = smoothRef.current;
+          arr.push(res.kg);
+          if (arr.length > SMOOTH_WINDOW) arr.shift();
+          const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
+
+          setDisplayKg(formatWeight(avg));
+        }
+      })().catch(() => {
+        // Si la lectura cae, dejamos el watchdog encargarse del 0.000
+      });
+    } catch (e: any) {
+      console.error(e);
+      setConnected(false);
+      setConnectionStatus(`Error: ${e.message}`);
+      setDisplayKg('0.000');
+    }
+  }
+
+  // Función principal de conexión
+  async function connect(portPath?: string) {
+    console.log('🚀 Función connect llamada:', { portPath, isElectron, isElectronApp });
+    
+    if (isElectron && isElectronApp) {
+      console.log('📱 Usando conexión Electron');
+      await connectElectron(portPath);
+    } else {
+      console.log('🌐 Usando conexión Web');
+      await connectWeb();
+    }
+  }
+
+  async function disconnect() {
+    keepRef.current = false;
+    
+    if (isElectron && isElectronApp && window.electronSerial) {
+      // Desconectar en Electron
+      try {
+        if (window.electronSerial.removeDataListener) {
+          window.electronSerial.removeDataListener();
+        }
+        await window.electronSerial.disconnect();
+      } catch (e) {
+        console.error('Error disconnecting in Electron:', e);
+      }
+    } else {
+      // Desconectar en navegador web
+      try { readerRef.current?.releaseLock(); } catch {}
+      try { await portRef.current?.close?.(); } catch {}
+    }
+    
+    setConnected(false);
+    setConnectionStatus('');
+    setDisplayKg('0.000');
+  }
+
+  // Cargar puertos disponibles cuando se detecta Electron
+  useEffect(() => {
+    if (!isElectronApp) return;
+    
+    const loadPorts = async () => {
+      try {
+        if (!window.electronSerial) {
+          setDebugInfo('❌ API de Electron Serial no disponible');
+          return;
+        }
+        
+        setDebugInfo('🔄 Cargando puertos...');
+        const ports = await window.electronSerial.listPorts();
+        console.log('🔍 Debug - Puertos encontrados:', ports);
+        const portPaths = ports.map(port => port.path);
+        setAvailablePorts(portPaths);
+        setDebugInfo(`✅ ${portPaths.length} puertos encontrados: ${portPaths.join(', ')}`);
+        
+        // Auto-seleccionar COM1 si está disponible
+        if (portPaths.includes('COM1')) {
+          setSelectedPort('COM1');
+          console.log('✅ Debug - COM1 seleccionado automáticamente');
+        } else if (portPaths.length > 0) {
+          setSelectedPort(portPaths[0]);
+          console.log('✅ Debug - Puerto seleccionado:', portPaths[0]);
+        }
+      } catch (e) {
+        console.error('❌ Debug - Error loading ports:', e);
+        setDebugInfo(`❌ Error cargando puertos: ${e}`);
+      }
+    };
+    
+    loadPorts();
+  }, [isElectronApp]);
+
+  // Limpieza on unmount
+  useEffect(() => {
+    return () => { disconnect(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div
+      style={{
+        // background: '#0b0b0c',
+        color: '#eaeaea',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 24,
+        fontFamily: 'system-ui, Arial, sans-serif',
+      }}
+    >
+      {/* <h1 style={{ margin: 0, fontWeight: 700, letterSpacing: 1 }}>Balanza La Torre</h1> */}
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <div
+          style={{
+            fontSize: '12vw',            // muy grande y responsivo
+            lineHeight: 1,
+            fontWeight: 700,
+            letterSpacing: '0.05em',
+            padding: '0.15em 0.25em',
+            borderRadius: 16,
+            // background: '#111',
+            // boxShadow: '0 0 40px rgba(0,0,0,.35) inset, 0 0 30px rgba(0,0,0,.4)',
+          //   minWidth: '70vw',
+            textAlign: 'center',
+          }}
+        >
+          {displayKg} 
+        </div>
+        <div style={{ 
+            fontSize: '11vw',            // muy grande y responsivo
+            lineHeight: 1,
+            fontWeight: 600, }}>KG</div>
+
+      </div>
+
+      {/* Mostrar estado de conexión */}
+      {connectionStatus && (
+        <div style={{
+          fontSize: 14,
+          color: connected ? '#4ade80' : '#fbbf24',
+          textAlign: 'center',
+          marginBottom: 8
+        }}>
+          {connectionStatus}
+        </div>
+      )}
+
+      {/* Mostrar información de debug */}
+      {debugInfo && (
+        <div style={{
+          fontSize: 12,
+          color: '#888',
+          textAlign: 'center',
+          marginBottom: 8,
+          padding: '4px 8px',
+          background: '#222',
+          borderRadius: 4,
+          fontFamily: 'monospace'
+        }}>
+          {debugInfo}
+        </div>
+      )}
+
+      {!connected ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          {/* Selector de puerto para Electron */}
+          {isElectronApp && availablePorts.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <label style={{ fontSize: 14, color: '#ccc' }}>Puerto Serial:</label>
+              <select
+                value={selectedPort}
+                onChange={(e) => setSelectedPort(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1px solid #2a2a2a',
+                  background: '#1c1c1f',
+                  color: '#fff',
+                  fontSize: 14,
+                  minWidth: 120
+                }}
+              >
+                {availablePorts.map(port => (
+                  <option key={port} value={port}>{port}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            {/* Botón conectar automático (Electron) */}
+            {isElectronApp && (
+              <button
+                onClick={() => connect()}
+                style={{
+                  padding: '14px 22px',
+                  borderRadius: 12,
+                  border: '1px solid #2a2a2a',
+                  background: '#1c1c1f',
+                  color: '#fff',
+                  fontSize: 16,
+                  cursor: 'pointer',
+                }}
+              >
+                Auto-conectar
+              </button>
+            )}
+
+            {/* Botón conectar manual */}
+            <button
+              onClick={() => connect(isElectronApp ? selectedPort : undefined)}
+              style={{
+                padding: '14px 22px',
+                borderRadius: 12,
+                border: '1px solid #2a2a2a',
+                background: '#1c1c1f',
+                color: '#fff',
+                fontSize: 16,
+                cursor: 'pointer',
+              }}
+            >
+              {isElectronApp ? `Conectar ${selectedPort}` :  `Conectar balanza! ${selectedPort}`}
+            </button>
+            <button
+              onClick={() => connect()}
+              style={{
+                padding: '14px 22px',
+                borderRadius: 12,
+                border: '1px solid #2a2a2a',
+                background: '#1c1c1f',
+                color: '#fff',
+                fontSize: 16,
+                cursor: 'pointer',
+              }}
+            >
+              {isElectronApp ? `Conectar Electron 1 ${selectedPort}` :  `Conectar balanza Electron 2 ${selectedPort}`}
+            </button>
+          </div>
+
+          {/* Información adicional */}
+          {isElectronApp && availablePorts.length === 0 && (
+            <div style={{ fontSize: 12, color: '#888', textAlign: 'center', maxWidth: 300 }}>
+              No se detectaron puertos seriales. Asegúrate de que la balanza esté conectada.
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={disconnect}
+          style={{
+            padding: '10px 18px',
+            borderRadius: 10,
+            border: '1px solid #292929',
+            background: '#19191b',
+            color: '#bbb',
+            fontSize: 14,
+            cursor: 'pointer',
+          }}
+        >
+          Desconectar
+        </button>
+      )}
+    </div>
+  );
+}

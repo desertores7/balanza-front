@@ -1,0 +1,74 @@
+
+@use "../styles/customBootstrap.scss" as customBootstrap;
+
+:root {
+  --primary-font: 'Public Sans', -apple-system;
+  --secondary-font: 'Russo One', -apple-system;
+  --body: #EFF0F4;
+  --background-primary: #ffffff;
+  --background-secondary: #171717;
+
+  --primary : #2bd1c7;
+  --secondary : #8592A3;
+  --success: #71DD37;
+  --errors: #FF3E1D;
+
+  --text-primary: #22303EE5;
+  --text-secondary: #4C63E3;
+  --text-white: #FFFFFF;
+  --text-info: #4C63E3;
+
+  --border-primary: #FFFFFF;
+  --border-secondary: #E4E6E8;
+
+  --pill-success-bg: #E8FADF;
+  --pill-success-text: #78DF42;
+  --pill-errors-bg: #FFE0DB;
+  --pill-errors-text: #FF3E1D;
+  --pill-warning-bg: #FFF3CD;
+  --pill-warning-text: #FFC107;
+}
+
+.dark {
+
+  --body: #111111;
+
+  --background-primary: #111111;
+  --background-secondary: #171717;
+
+  --primary: #06f5e586;
+  --secondary: #999999;
+  --success: #71DD37;
+  --errors: #ff3f1d7a;
+
+  --text-primary: #f5f5f5;
+  --text-secondary: #ffa500;
+  --text-white: #111111;
+  --border-primary: #2e3135;
+
+  --pill-success-bg: #e8fadf00;
+  --pill-success-text: #78DF42;
+  --pill-errors-bg: #ffe0db00;
+  --pill-errors-text: #ff3f1dd2;
+}
+
+
+body {
+  background: var(--body);
+  color: var(--foreground);
+  font-family: var(--primary-font);
+}
+
+/* Quitar flechas en Chrome, Edge y Safari */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Quitar flechas en Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+

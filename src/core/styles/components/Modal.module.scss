@@ -1,0 +1,58 @@
+.modal{
+    .modalTitle{
+        color: var(--text-primary);
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+    }
+    :global(.modal-weighing-final){
+        color: var(--text-primary);
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+    }
+    :global(.modal-content){
+        background-color: var(--background-primary);
+        border-radius: 16px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;        
+        padding: 30px;
+        margin: auto;
+        gap: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            padding: 2px;
+            background: linear-gradient(45deg,#4C63E3, #0BEEBF, #17D4C6, #2AABD1, #3D83DB, #0BEEBF, #4473DF,  #0BEEBF);
+            background-size: 400% 400%;
+            animation: gradientMove 3s ease infinite;
+            z-index: -1;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+        }
+    }
+
+}
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

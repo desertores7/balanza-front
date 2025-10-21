@@ -1,0 +1,624 @@
+@use "../../styles/components/Title.module.scss";
+@use "../../styles/helpers/_mixins.scss" as mixins;
+
+.tableContainer{
+    padding: 10px 20px 0 20px;
+        background-color: var(--background-primary);
+        border-radius: 10px;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+    .titleTable{
+        margin-bottom: 20px;
+    }
+}
+
+.table{
+    border: 1px solid var(--border-secondary)!important;
+    border-radius: 10px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    
+    td, th{
+        background-color: transparent!important;
+        box-shadow: none!important;
+        border-left: none!important;
+        border-right: none!important;
+        // padding-left: 20px!important;
+        vertical-align: middle!important;
+    }
+    td{
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--text-primary);
+        border-top: none!important;
+        border-bottom: 1px solid var(--border-secondary)!important;
+        @include mixins.media-md{
+            font-size: 12px;
+        }
+        @include mixins.media-lg{
+            font-size: 14px;
+        }
+    
+    }
+    thead{
+        background-color: #64748b1a;
+        
+        th{
+            padding-top: 15px;
+            padding-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-secondary)!important;
+        }
+    }
+    tr{
+        border: none;
+    }
+    th{
+        font-weight: 400;
+        text-transform: uppercase;
+        font-size: 14px;
+        color: var(--text-primary);
+        position: relative;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        line-height: 1;
+        @include mixins.media-md{
+            font-size: 12px;
+        }
+        @include mixins.media-lg{
+            font-size: 14px;
+        }
+        &::after{
+            content: "";
+            display: block;
+            width: 1px;
+            height: 20px;
+            background-color: var(--border-secondary);
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            margin: auto;
+        }
+    }
+    
+    // Columna del checkbox
+    th:first-child,
+    td:first-child{
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        text-align: center;
+        padding-left: 10px;
+        padding-right: 10px;
+        
+    }
+}
+
+.tableHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.filtersContainer{
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    @include mixins.media-md{
+        gap: 10px;
+    }
+    @include mixins.media-lg{
+        gap: 20px;
+    }
+
+}
+
+.searchInput{
+    @include mixins.media-md{
+        width: 250px;    
+    }
+    @include mixins.media-lg{
+        width: 300px;    
+    }
+    &::placeholder{
+        font-size: 14px;
+        color: var(--secondary);
+    }
+}
+
+.searchContainer{
+    position: relative;
+    .searchIcon{
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        display: flex;
+        align-items: center;
+    }
+    .searchInput{
+        padding-left: 30px;
+    }
+}
+
+.emptyAvatar{
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-primary);
+    color: var(--text-white);
+    text-transform: uppercase;
+    letter-spacing: -0.15em;
+}
+
+.selectInput{
+    min-width: 160px !important;
+    font-size: 14px;
+    color: var(--text-primary);
+    &::placeholder{
+        font-size: 14px;
+        color: var(--secondary);
+    }
+}
+
+.dateRangeContainer{    
+    @include mixins.media-md{
+        width: 230px;
+    }
+    @include mixins.media-lg{
+        width: 250px;
+    }
+    :global(.react-datepicker-wrapper) {
+        width: 100%;
+    }
+    
+    :global(.react-datepicker__input-container) {
+        width: 100%;
+        
+        input {
+            width: 100%;
+            font-size: 14px;
+            color: var(--text-primary);
+            background-color: var(--background-primary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 4px;
+            padding: 8px 12px;
+            
+            &::placeholder {
+                color: var(--secondary);
+                font-size: 14px;
+            }
+            
+            &:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            }
+        }
+    }
+    
+    // Estilos del calendario desplegable
+    :global(.react-datepicker) {
+        background-color: var(--background-primary);
+        border: 1px solid var(--border-secondary);
+        border-radius: 8px;
+        font-family: inherit;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    :global(.react-datepicker__header) {
+        background-color: var(--background-primary);
+        border-bottom: 1px solid var(--border-secondary);
+        padding-top: 12px;
+    }
+    
+    :global(.react-datepicker__current-month) {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    :global(.react-datepicker__day-name) {
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        margin: 4px;
+        width: 32px;
+        line-height: 32px;
+    }
+    
+    :global(.react-datepicker__day) {
+        color: var(--text-primary);
+        font-size: 13px;
+        margin: 4px;
+        width: 32px;
+        line-height: 32px;
+        border-radius: 4px;
+        
+        &:hover {
+            background-color: var(--primary);
+            color: var(--text-white);
+        }
+    }
+    
+    // Estilos para días seleccionados y en rango
+    :global(.react-datepicker__day--selected),
+    :global(.react-datepicker__day--in-range),
+    :global(.react-datepicker__day--range-start),
+    :global(.react-datepicker__day--range-end) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+    
+    // Estilo para el día de inicio del rango
+    :global(.react-datepicker__day--range-start) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    
+    // Estilo para el día final del rango
+    :global(.react-datepicker__day--range-end) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    
+    // Estilo para días en el rango (entre inicio y fin)
+    :global(.react-datepicker__day--in-range:not(.react-datepicker__day--range-start):not(.react-datepicker__day--range-end)) {
+        background-color: rgba(var(--primary-rgb), 0.2) !important;
+        color: var(--text-primary);
+        border-radius: 0;
+        position: relative;
+        
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(var(--primary-rgb), 0.1);
+            z-index: -1;
+        }
+    }
+    
+    // Estilo específico para días en selección que no están en rango final
+    :global(.react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range)) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border-radius: 6px;
+        position: relative;
+        z-index: 3;
+        font-weight: 600;
+    }
+    
+    // Estilo para días que están siendo seleccionados (mientras arrastras)
+    :global(.react-datepicker__day--in-selecting-range) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border-radius: 6px;
+        position: relative;
+        z-index: 2;
+        font-weight: 600;
+        
+        // Efecto de pulso más sutil
+        animation: selectingPulse 1s ease-in-out infinite;
+    }
+    
+    // Animación más sutil para la selección
+    @keyframes selectingPulse {
+        0% {
+            background-color: var(--primary);
+            transform: scale(1);
+            opacity: 0.8;
+        }
+        50% {
+            background-color: var(--primary);
+            transform: scale(1.02);
+            opacity: 1;
+        }
+        100% {
+            background-color: var(--primary);
+            transform: scale(1);
+            opacity: 0.8;
+        }
+    }
+    
+    // Animación de pulso para la selección en progreso
+    @keyframes pulse {
+        0% {
+            background-color: rgba(var(--primary-rgb), 0.2);
+        }
+        50% {
+            background-color: rgba(var(--primary-rgb), 0.4);
+        }
+        100% {
+            background-color: rgba(var(--primary-rgb), 0.2);
+        }
+    }
+    
+    // Estilo para el día actual
+    :global(.react-datepicker__day--today) {
+        background-color: transparent;
+        color: var(--primary);
+        font-weight: 600;
+        border: 1px solid var(--primary);
+        border-radius: 4px;
+    }
+    
+    // Estilo para el día actual cuando está en rango
+    :global(.react-datepicker__day--today.react-datepicker__day--in-range) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border: 1px solid var(--primary);
+    }
+    
+    :global(.react-datepicker__day--disabled) {
+        color: var(--secondary);
+        cursor: not-allowed;
+        
+        &:hover {
+            background-color: transparent;
+            color: var(--secondary);
+        }
+    }
+    
+    :global(.react-datepicker__navigation) {
+        top: 12px;
+        
+        &:hover {
+            .react-datepicker__navigation-icon::before {
+                border-color: var(--primary);
+            }
+        }
+    }
+    
+    :global(.react-datepicker__navigation-icon::before) {
+        border-color: var(--text-primary);
+    }
+    
+    // Estilos para el botón de cerrar personalizado
+    :global(.react-datepicker__close-icon) {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        position: absolute;
+        right: 8px;
+        z-index: 10;
+        
+        &::after {
+            content: '✖';
+            background-color: var(--primary);
+            border-radius: 50%;
+            color: var(--text-white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        &:hover::after {
+            background-color: var(--secondary);
+        }
+    }
+    
+    // Estilos adicionales para mejorar la experiencia del rango
+    :global(.react-datepicker__month-container) {
+        background-color: var(--background-primary);
+    }
+    
+    // Estilo para el mes y año en el header
+    :global(.react-datepicker__current-month) {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    // Estilo para los nombres de los días de la semana
+    :global(.react-datepicker__day-name) {
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        margin: 4px;
+        width: 32px;
+        line-height: 32px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    // Estilo para el hover en días normales
+    :global(.react-datepicker__day:not(.react-datepicker__day--disabled):not(.react-datepicker__day--selected):not(.react-datepicker__day--in-range):not(.react-datepicker__day--range-start):not(.react-datepicker__day--range-end)) {
+        &:hover {
+            background-color: rgba(var(--primary-rgb), 0.1);
+            color: var(--text-primary);
+            border-radius: 4px;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
+        }
+    }
+    
+    // Estilo para días fuera del mes actual
+    :global(.react-datepicker__day--outside-month) {
+        color: var(--secondary);
+        opacity: 0.5;
+    }
+    
+    // Estilo para el rango cuando está completo
+    :global(.react-datepicker__day--in-range:not(.react-datepicker__day--range-start):not(.react-datepicker__day--range-end)) {
+        position: relative;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+    }
+    
+    // Estilos adicionales para mejorar la visibilidad de la selección
+    :global(.react-datepicker__day--selecting-range-start) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border-radius: 6px 0 0 6px;
+        font-weight: 600;
+        z-index: 4;
+    }
+    
+    :global(.react-datepicker__day--selecting-range-end) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border-radius: 0 6px 6px 0;
+        font-weight: 600;
+        z-index: 4;
+    }
+    
+    // Estilo para días intermedios durante la selección
+    :global(.react-datepicker__day--in-selecting-range:not(.react-datepicker__day--selecting-range-start):not(.react-datepicker__day--selecting-range-end)) {
+        background-color: var(--primary) !important;
+        color: var(--text-white) !important;
+        border-radius: 6px;
+        position: relative;
+        font-weight: 600;
+    }
+}
+
+.tableFooter{
+    background-color: var(--background-primary);
+    border: 1px solid var(--border-secondary);
+    
+    td{
+        border-top: 1px solid var(--border-secondary) !important;
+    }
+    
+    .paginationCell{
+        padding: 20px !important;
+        border: none !important;
+    }
+    
+    .paginationContainer{   
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .paginationInfo{
+        color: var( --text-primary);
+        font-size: 14px;
+        font-weight: 400;
+    }
+    
+    .paginationButtons{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .paginationButton{
+        min-width: 40px;
+        height: 32px;
+        padding: 0 8px;
+        border: 1px solid var(--border-secondary);
+        background-color: var(--background-primary);
+        color: var(--text-primary);
+        font-size: 12px;
+        transition: all 0.2s ease;
+        
+        &:hover:not(:disabled){
+            background-color: var(--primary);
+            color: var(--text-white);
+            border-color: var(--primary);
+        }
+        
+        &:disabled{
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+    
+    .pageSizeSelect{
+        padding: 6px 12px;
+        border: 1px solid var(--border-secondary);
+        border-radius: 6px;
+        background-color: var(--background-primary);
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 400;
+        margin-left: 12px;
+        min-width: 70px;
+        height: 36px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:hover{
+            border-color: var(--primary);
+        }
+        
+        &:focus{
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+        }
+        
+        option{
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            padding: 8px;
+        }
+    }
+    .paginationButtons{
+        button.activePage{
+            background-color: var(--primary)!important;
+            color: var(--text-white)!important;
+            opacity: 1;
+            &:disabled{
+                color: var(--text-white)!important;
+            }
+        }
+        button{
+            opacity: 1;
+            background-color: var(--background-primary)!important;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 400;
+            &:disabled{
+                color: var(--secondary)!important;
+            }
+        }
+    }
+}

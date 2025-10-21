@@ -1,0 +1,233 @@
+  @use "../components/Title.module.scss";
+  @use "../helpers/_mixins.scss" as mixins;
+  .sidebar {
+    --width-open: 260px;
+    --width-closed: 80px; 
+    width: var(--width-closed);
+    background: var(--text-white);
+    transition: width 0.3s;
+    height: 100%;
+    min-height: 100vh;
+    position: sticky;
+    @include mixins.media-md{
+      --width-open: 180px;
+      --width-closed: 80px; 
+    }
+    @include mixins.media-lg{
+      --width-open: 260px;
+      --width-closed: 80px; 
+    }
+
+    
+    button {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    &.open {
+      width: var(--width-open);
+    }
+
+    .sidebarInnerContainer {
+      position: fixed;
+    }
+    .inner {
+      // width: var(--width-open);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--border-primary);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      width: var(--width-closed);
+      transition: 0.3s;
+      position: relative;
+      justify-content: center;
+      flex-direction: column;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #BEC7CC;
+
+      
+
+      img{
+        padding: 10px 0;
+      }
+
+      .logo {
+        margin-left: 12px;
+        font-weight: 700;
+        font-size: 24px;
+        letter-spacing: 1px;
+        margin-bottom: 0;
+      }
+    }
+
+    &.open .header {
+      width: var(--width-open);
+    }
+
+    .logo {
+      height: 28px;
+    }
+
+    .menu {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: var(--width-closed);
+      flex: 1 1 auto;
+      
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 56px;
+        width: 6px;
+        background: var(--primary);
+        translate: 0 var(--top);
+        transition: 0.3s;      
+        border-radius: 0px 4px 4px 0px;
+
+      }
+
+      button {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        height: 56px;
+        width: 100%;
+        font-size: 17px;
+        text-transform: capitalize;
+        line-height: 1;
+        padding: 0 22px;
+        color: var(--text-primary);
+        cursor: pointer;
+        border-bottom: 1px solid var(--border-primary);
+
+        .boxButton{
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: center;
+          column-gap: 20px;
+          width: 200px;
+          display: flex;
+
+          p{
+            margin: 0;
+          }
+        }
+
+        &.active {
+          color: var(--primary);
+          background: rgb(255 255 255 / 3%);
+          opacity: 1;
+        }
+
+        > svg {
+          color: var(--primary) !important;
+        }
+      }
+    }
+
+    &.open .menu {
+      width: var(--width-open);
+      transition: width 0.3s;
+    }
+
+    &.open :is(.menu button p) {
+      opacity: 1;
+      transition: all .3s;    
+    }
+    
+
+    .buttonToggle{
+      position: absolute;
+      right: -20px;
+      top: 20px;
+      transform: translateX(-50%);
+      z-index: 2;
+      padding: 4px;
+      background-color: var(--background-primary);
+      border-radius: 50%;
+      border: 1px solid var(--border-primary);
+      box-shadow: 0 2px 5px -1px rgb(50 50 93 / 11%), 0 1px 3px -1px rgb(0 0 0 / 8%);
+      
+      svg{
+        color: var(--primary);
+      }
+    }
+  }
+
+  .submenu {
+    display: flex;
+    flex-direction: column;
+    padding-left: 30px;
+    background: #fafafa;
+  
+    .subItem {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 40px;
+      font-size: 14px;
+      color: var(--text-primary);
+      opacity: 0.8;
+      cursor: pointer;
+      transition: 0.2s;
+      background: transparent;
+      border: none;
+      text-align: left;
+  
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ccc;
+        transition: 0.3s;
+        position: relative;
+      }
+  
+      &:hover {
+        opacity: 1;
+        color: var(--primary);
+  
+        .dot {
+          background: var(--primary);
+        }
+      }
+    }
+  
+    .subActive {
+      color: var(--primary);
+      opacity: 1;
+  
+      .dot {
+        background: var(--primary);
+  
+        &::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: #f5f5f9;
+          z-index: -1;
+        }
+      }
+    }
+  }
+  
+
+  

@@ -1,0 +1,49 @@
+.toggle {
+    width: auto;
+    height: auto;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    line-height: 1;
+
+
+    .iconCustom {
+      grid-column: 1 / 1;
+      grid-row: 1 / 1;
+      transition: transform 500ms;
+      line-height: 0.1;
+    }
+  }
+  
+  .input {
+    display: none;
+  }
+  
+  .iconMoon {
+    transition-delay: 200ms;
+    color: #b4b4b4;
+  }
+  
+  .iconSun {
+    transform: scale(0);
+    color: #ffa500;
+  }
+  
+  #switch:checked + .iconMoon {
+    transform: rotate(360deg) scale(0);
+  }
+  
+  #switch:checked ~ .iconSun {
+    transition-delay: 200ms;
+    transform: scale(1) rotate(360deg);
+  }
+  
+  .hidden {
+    transform: rotate(360deg) scale(0);
+  }
+  
+  .visible {
+    transition-delay: 200ms;
+    transform: scale(1) rotate(360deg);
+  }

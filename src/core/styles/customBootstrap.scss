@@ -1,0 +1,111 @@
+.btn-primary{
+    background-color: var(--primary) !important;
+    border-color: var(--border-primary) !important;
+}
+.btn-secondary{
+    background-color: var(--secondary) !important;
+}
+.btn-success{
+    background-color: var(--success) !important;
+    border-color: var(--success) !important;
+}
+.btn-danger{
+    background-color: var(--errors) !important;
+    border-color: var(--errors) !important;
+}
+
+.btn-primary:hover{
+    background-color: var(--background-primary) !important;
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+.btn-secondary:hover{
+    background-color: var(--background-primary) !important;
+    color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+}
+.btn-success:hover{
+    background-color: var(--background-primary) !important;
+    color: var(--success) !important;
+    border-color: var(--success) !important;
+}
+.btn-danger:hover{
+    background-color: var(--background-primary) !important;
+    color: var(--errors) !important;
+    border-color: var(--errors) !important;
+}
+
+.btn-outline-primary{
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+.btn-outline-secondary{
+    color: var(--secondary)!important;
+    border-color: var(--secondary) !important;
+}
+.btn-outline-success{
+    color: var(--success) !important;
+    border-color: var(--success) !important;
+}
+.btn-outline-danger{
+    color: var(--errors) !important;
+    border-color: var(--errors) !important;
+}
+
+.btn-outline-primary:hover{
+    color: var(--text-white) !important;
+    background-color: var(--primary) !important;
+}
+.btn-outline-secondary:hover{
+    color: var(--text-white) !important;
+    background-color: var(--secondary);
+}
+.btn-outline-success:hover{
+    color: var(--text-white) !important;
+    background-color: var(--success) !important;
+}
+.btn-outline-danger:hover{
+    color: var(--text-white) !important;
+    background-color: var(--errors) !important;
+}
+.badge.bg-primary{
+    background-color: var(--pill-success-bg) !important;
+    color: var(--pill-success-text) !important;
+    border: 1px solid var(--pill-success-text) !important;
+}
+.badge.bg-danger{
+    background-color: var(--pill-errors-bg) !important;
+    color: var(--pill-errors-text) !important;
+    border: 1px solid var(--pill-errors-text) !important;
+}
+.badge.bg-warning{
+    background-color: var(--pill-warning-bg) !important;
+    color: var(--pill-warning-text) !important;
+    border: 1px solid var(--pill-warning-text) !important;
+}
+.alert-danger{
+    background-color: var(--pill-errors-bg) !important;
+    color: var(--pill-errors-text) !important;
+}
+
+.form-check-input:checked{
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+.form-control{
+    background-color: var(--background-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-label{
+    color: var(--text-primary) !important;
+}
+.form-control::placeholder{
+    color: var(--text-primary) !important;
+}
+
+.form-control:focus{
+    outline: none !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1) !important;
+}
