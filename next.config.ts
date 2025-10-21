@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
   compress: true, // Comprimir respuestas
   poweredByHeader: false, // Remover header X-Powered-By
   
-  // ⚡ Optimización de JavaScript
-  swcMinify: true, // Usar SWC minifier (más rápido que Terser)
-  
   // 📦 Optimización de compilación
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {
