@@ -30,22 +30,19 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'], // Formatos modernos optimizados
   },
   
-  // 📋 Headers optimizados
-  async headers() {
+  // 🔄 Rewrites para PWA
+  async rewrites() {
     return [
       {
         source: '/manifest.json',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
-          },
-        ],
+        destination: '/api/manifest',
       },
+    ];
+  },
+  
+  // 📋 Headers optimizados
+  async headers() {
+    return [
       {
         source: '/sw.js',
         headers: [
@@ -70,6 +67,15 @@ const nextConfig: NextConfig = {
             key: 'Content-Type',
             value: 'application/javascript; charset=utf-8',
           },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/assets/:path*',
+        headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
